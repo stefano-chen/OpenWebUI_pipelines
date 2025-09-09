@@ -1,6 +1,5 @@
 from typing import List, Union, Generator, Iterator
 from pathlib import Path
-from dotenv import load_dotenv
 from classes.rag import RAG
 
 class Pipeline:
