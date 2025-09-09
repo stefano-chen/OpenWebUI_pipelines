@@ -13,7 +13,7 @@ class Pipeline:
 
     async def on_startup(self):
         # This function is called when the server is started.
-        load_dotenv("./.env")
+        # load_dotenv("./.env")
         self.rag_system = RAG(
             pdf_dir_path=self.DATA_DIR_PATH, 
             google_llm="gemini-2.5-flash-lite", 

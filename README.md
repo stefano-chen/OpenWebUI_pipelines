@@ -4,6 +4,18 @@
 
 # Pipelines: UI-Agnostic OpenAI API Plugin Framework
 
+> [!TIP by @stefano-chen]
+> **ENVIRONMENT VARIABLES**
+>
+> You can modify some server behavior by modifying some environment variables value.
+> You must create a file called ```.env``` inside the root folder.
+> The environment variables available are:
+> | NAME              | DESCRIPTION                                                                  | DEFAULT VALUES     | POSSIBLE VALUES  |
+> |-------------------|------------------------------------------------------------------------------|--------------------|------------------|
+> | PIPELINES_API_KEY | API key that OpenWebUI uses to authenticate requests to custom pipelines.    |"0p3n-w3bu!"        | Any string       |
+> | PIPELINES_DIR     | Path to the directory containing the custom pipeline code                    |"./pipelines"       | Any Existing Path|
+> | GLOBAL_LOG_LEVEL  | setup the global Logging LEVEL                                               |"INFO"              | "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"|
+
 > [!TIP]
 > **DO NOT USE PIPELINES!**
 >
