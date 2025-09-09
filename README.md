@@ -4,7 +4,8 @@
 
 # Pipelines: UI-Agnostic OpenAI API Plugin Framework
 
-> [!TIP by @stefano-chen]
+> [!TIP]
+> by @stefano-chen
 > **ENVIRONMENT VARIABLES**
 >
 > You can modify some server behavior by modifying some environment variables value.
