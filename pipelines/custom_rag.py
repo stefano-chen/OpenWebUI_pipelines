@@ -3,7 +3,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 from classes.rag import RAG
 
-
 class Pipeline:
 
     DATA_DIR_PATH = Path("./data")
