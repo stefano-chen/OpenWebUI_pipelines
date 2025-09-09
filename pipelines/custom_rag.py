@@ -20,7 +20,6 @@ class Pipeline:
             huggingface_embedding="sentence-transformers/all-mpnet-base-v2",
             datastore_dir_path=self.DATASTORE_DIR_PATH
         )
-        pass
 
     async def on_shutdown(self):
         # This function is called when the server is stopped.
