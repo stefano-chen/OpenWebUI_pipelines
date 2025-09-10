@@ -10,7 +10,7 @@ class ChunksSummarizer:
     "Context:\n{context}"
     
     def __init__(self, chunks: List[Document]):
-        # self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")
+        self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")
         # self.llm = HuggingFacePipeline.from_model_id(
         #     model_id="mistralai/Mistral-7B-v0.3",
         #     task="text-generation"
