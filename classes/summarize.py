@@ -2,6 +2,7 @@ from langchain_core.documents import Document
 from typing_extensions import List
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
+from langchain_huggingface.llms import HuggingFacePipeline
 
 class ChunksSummarizer:
 
@@ -9,7 +10,11 @@ class ChunksSummarizer:
     "Context:\n{context}"
     
     def __init__(self, chunks: List[Document]):
-        self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")
+        # self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")
+        self.llm = HuggingFacePipeline.from_model_id(
+            model_id="mistralai/Mistral-7B-v0.3",
+            task="text-generation"
+        )
         self.chunks = chunks
 
     def summarize(self) -> List[Document]:

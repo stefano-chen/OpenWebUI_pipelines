@@ -8,6 +8,7 @@ class Pipeline:
     DATASTORE_DIR_PATH = Path("./datastore")
 
     def __init__(self):
+        # This is used to define Valves
         pass
 
     async def on_startup(self):
@@ -26,5 +27,9 @@ class Pipeline:
 
     def pipe(self, user_message: str, model_id: str, messages: List[dict], body: dict) -> Union[str, Generator, Iterator]:
         # This is where you can add your custom RAG pipeline.
+        print(f"\nUSER_MESSAGE: {user_message}")
+        print(f"\nMODEL_ID: {model_id}")
+        print(f"\nMESSAGES: {messages}")
+        print(f"\nBODY: {body}")
         answer = self.rag_system.answer(query=user_message)
         return answer

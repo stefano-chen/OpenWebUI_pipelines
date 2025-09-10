@@ -2,6 +2,7 @@ from classes.loader import PDFLoader
 from classes.text_splitter import DocumentSplitter
 from classes.retriever import FAISSBM25Retriever
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_huggingface.llms import HuggingFacePipeline
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from pathlib import Path
 from langchain.prompts import PromptTemplate
@@ -16,7 +17,11 @@ class RAG:
     "Question: {question}"
 
     def __init__(self, pdf_dir_path: Path, google_llm: str, huggingface_embedding: str, datastore_dir_path: str | Path | None):
-        self.llm = ChatGoogleGenerativeAI(model=google_llm)
+        # self.llm = ChatGoogleGenerativeAI(model=google_llm)
+        self.llm = HuggingFacePipeline.from_model_id(
+            model_id="mistralai/Mistral-7B-v0.3",
+            task="text-generation",
+        )
         self.embedding_model = HuggingFaceEmbeddings(model_name=huggingface_embedding)
         if not datastore_dir_path.exists():
             self.loader = PDFLoader(dir_path=pdf_dir_path)
