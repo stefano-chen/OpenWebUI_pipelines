@@ -672,12 +672,12 @@ async def generate_openai_chat_completion(form_data: OpenAIChatCompletionForm):
         )
 
     def job():
-        print(form_data.model)
+        # print(form_data.model)s
 
         pipeline = app.state.PIPELINES[form_data.model]
         pipeline_id = form_data.model
 
-        print(pipeline_id)
+        # print(pipeline_id)
 
         if pipeline["type"] == "manifold":
             manifold_id, pipeline_id = pipeline_id.split(".", 1)
@@ -741,7 +741,6 @@ async def generate_openai_chat_completion(form_data: OpenAIChatCompletionForm):
 
                     yield f"data: {json.dumps(finish_message)}\n\n"
                     yield f"data: [DONE]"
-
             return StreamingResponse(stream_content(), media_type="text/event-stream")
         else:
             res = pipe(

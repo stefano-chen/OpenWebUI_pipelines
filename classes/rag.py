@@ -18,10 +18,6 @@ class RAG:
 
     def __init__(self, pdf_dir_path: Path, google_llm: str, huggingface_embedding: str, datastore_dir_path: str | Path | None):
         self.llm = ChatGoogleGenerativeAI(model=google_llm)
-        # self.llm = HuggingFacePipeline.from_model_id(
-        #     model_id="mistralai/Mistral-7B-v0.3",
-        #     task="text-generation",
-        # )
         self.embedding_model = HuggingFaceEmbeddings(model_name=huggingface_embedding)
         if not datastore_dir_path.exists():
             self.loader = PDFLoader(dir_path=pdf_dir_path)
@@ -33,13 +29,13 @@ class RAG:
             self.retriever = FAISSBM25Retriever(embedding_model=self.embedding_model)
             self.retriever.load(datastore_dir_path)
 
-    def answer(self, query: str) -> str:
-        query_enhancer = QueryEnhancement(query=query)
-        enhanced_query = query_enhancer.enhance()
-        retrieved_chunks = self.retriever.retrieve(query=enhanced_query)
-        chunks_summarizer = ChunksSummarizer(retrieved_chunks)
-        summarized_chunks = chunks_summarizer.summarize()
-        context = "\n\n".join(chunk.page_content for chunk in summarized_chunks)
+    def answer(self, query: str) -> list[str]:
+        # query_enhancer = QueryEnhancement(query=query)
+        # enhanced_query = query_enhancer.enhance()
+        retrieved_chunks = self.retriever.retrieve(query=query)
+        # chunks_summarizer = ChunksSummarizer(retrieved_chunks)
+        # summarized_chunks = chunks_summarizer.summarize()
+        context = "\n\n".join(chunk.page_content for chunk in retrieved_chunks)
         prompt = PromptTemplate.from_template(self.QA_PROMPT)
         answering_chain = prompt | self.llm
         answer = answering_chain.invoke(input={"context": context, "question": query})

@@ -10,10 +10,6 @@ class QueryEnhancement:
     
     def __init__(self, query: str):
         self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")
-        # self.llm = HuggingFacePipeline.from_model_id(
-        #     model_id="mistralai/Mistral-7B-v0.3",
-        #     task="text-generation"
-        # )
         self.prompt = PromptTemplate.from_template(self.QUERY_ENHANCEMENT_PROMPT)
         self.query = query
         self.enhancement_chain = self.prompt | self.llm
