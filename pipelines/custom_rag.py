@@ -13,6 +13,7 @@ from pathlib import Path
 from langchain.prompts import PromptTemplate
 from classes.query import QueryEnhancement
 from classes.summarize import ChunksSummarizer
+from langchain_openai import ChatOpenAI
 
 # Uncomment to disable SSL verification warnings if needed.
 # warnings.filterwarnings('ignore', message='Unverified HTTPS request')
@@ -37,7 +38,14 @@ class Pipeline:
     async def on_startup(self):
         # This function is called when the server is started.
 
-        self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")
+        # You first need to start the LM studio server by typing in the terminal
+        #  > lms server start -p 9999
+        # the -p flag is used to set a custom port number
+        self.llm = ChatOpenAI(
+            model="qwen/qwen3-4b-2507",
+            base_url="http://localhost:9999/v1",
+            api_key="not-needed" # LM Studio doesn't check it, but LangChain expects one
+        )
         self.embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
         if not self.DATA_DIR_PATH.exists():
             self.loader = PDFLoader(dir_path=self.DATA_DIR_PATH)
