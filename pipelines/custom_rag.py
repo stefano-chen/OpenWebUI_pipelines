@@ -49,7 +49,7 @@ class Pipeline:
             api_key="not-needed" # LM Studio doesn't check it, but LangChain expects one
         )
         self.embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
-        if not self.DATA_DIR_PATH.exists():
+        if not self.DATASTORE_DIR_PATH.exists():
             self.loader = PDFLoader(dir_path=self.DATA_DIR_PATH)
             loaded_docs = self.loader.load()
             splitter = DocumentSplitter(loaded_docs)
