@@ -15,7 +15,7 @@ from classes.query import QueryEnhancement
 from classes.summarize import ChunksSummarizer
 from langchain_openai import ChatOpenAI
 
-import asyncio
+import base64
 
 # Uncomment to disable SSL verification warnings if needed.
 # warnings.filterwarnings('ignore', message='Unverified HTTPS request')
@@ -83,7 +83,7 @@ class Pipeline:
             event["event"]["data"]["description"] = content
             event["event"]["data"]["done"] = done
         elif type == "message" or type == "replace":
-            event["event"]["data"]["content"]=content
+            event["event"]["data"]["content"]= content
         elif type == "files":
             event["event"]["data"]["files"] = content
 
@@ -126,6 +126,29 @@ class Pipeline:
         for token in answering_chain.stream(input={"context": context, "question": user_message}):
             yield self._send_event(type="message", content=token.content)
 
-        
 
+        # Send image/s in response
+
+        # NOT WORKING
+        # with open("./image/cat1.jpg", "rb") as img_file:
+        #     encoded_img = base64.b64encode(img_file.read()).decode("utf-8")
+        #     print(encoded_img)
+        #     yield self._send_event(type="message", content="![image](data:image/jpeg;base64,")
+        #     for chunk in encoded_img[::50]:
+        #         yield self._send_event(type="message", content=chunk)
+        #     yield self._send_event(type="message", content=")")
+
+        # with open("./image/cat1.jpg", "rb") as img_file:
+        #     b64_string = base64.b64encode(img_file.read()).decode("utf-8")
+
+        # yield {
+        #     "data": [
+        #         {
+        #             "b64_json": f"{b64_string[:200]}"
+        #         }
+        #     ]
+        # }
+
+        # WORKAROUND by sending a url/link of the image
+        yield self._send_event(type="files", content=[{"type": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/960px-Cat_November_2010-1a.jpg", "name": "cat"}])
 
