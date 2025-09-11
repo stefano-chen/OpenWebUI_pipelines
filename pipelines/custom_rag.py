@@ -61,79 +61,63 @@ class Pipeline:
         # This function is called after the OpenAI API response is completed. You can modify the messages after they are received from the OpenAI API.
         return body
 
+    def _send_event(self, type: str, content: str, done: bool = False):
+        event = {
+            "event": {
+                "type": "",
+                "data": {}
+                }
+            }
+        
+        if type == "status":
+            event["event"]["data"]["description"] = content
+            event["event"]["data"]["done"] = done
+        elif type == "message" or type == "replace":
+            event["event"]["data"]["content"]=content
+
+        event["event"]["type"] = type
+        return event
+            
+
     def pipe(self, user_message: str, model_id: str, messages: List[dict], body: dict,) -> Union[str, Generator, Iterator]:
         # This is where you can add your custom RAG pipeline.
         if not body["stream"]:
             return None
 
-        yield {
-            "event": {
-                "type": "status",
-                "data": {
-                    "description": "Retrieving Chunks",
-                    "done": False
-                },
-            }
-        }
+        yield self._send_event(type="status", content="Retrieving Chunks")
 
         time.sleep(5)
 
         retrieved_chunks = self.retriever.retrieve(query=user_message)
 
-        yield {
-            "event": {
-                "type": "status",
-                "data": {
-                    "description": "Aggregate Chunks",
-                    "done": False
-                }
-            }
-        }
+        yield self._send_event(type="status", content="Aggregating Chunks")
 
         time.sleep(5)
 
         context = "\n\n".join(chunk.page_content for chunk in retrieved_chunks)
 
-        yield {
-            "event": {
-                "type": "status",
-                "data": {
-                    "description": "Creating Prompt",
-                    "done": False
-                }
-            }
-        }
+        yield self._send_event(type="status", content="Creating Prompt")
 
         time.sleep(5)
 
         prompt = PromptTemplate.from_template(self.QA_PROMPT)
 
-        yield {
-            "event": {
-                "type": "status",
-                "data": {
-                    "description": "Asking LLM",
-                    "done": False
-                }
-            }
-        }
+        yield self._send_event(type="status", content="Asking LLM")
 
         time.sleep(5)
 
         answering_chain = prompt | self.llm
         answer = answering_chain.invoke(input={"context": context, "question": user_message})
 
-        yield {
-            "event": {
-                "type": "status",
-                "data": {
-                    "description": "Putting all together",
-                    "done": True
-                }
-            }
-        }
+        yield self._send_event(type="status", content="Putting all together", done=True)
 
-        yield answer.content
+        text = answer.content
+
+        for token in text:
+            yield self._send_event(type="message", content=token)
+            time.sleep(0.02)
+
+        self._send_event(type="replace", content=text)
 
 
 
