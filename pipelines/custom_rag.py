@@ -15,6 +15,8 @@ from classes.query import QueryEnhancement
 from classes.summarize import ChunksSummarizer
 from langchain_openai import ChatOpenAI
 
+import asyncio
+
 # Uncomment to disable SSL verification warnings if needed.
 # warnings.filterwarnings('ignore', message='Unverified HTTPS request')
 
@@ -69,7 +71,7 @@ class Pipeline:
         # This function is called after the OpenAI API response is completed. You can modify the messages after they are received from the OpenAI API.
         return body
 
-    def _send_event(self, type: str, content: str, done: bool = False):
+    def _send_event(self, type: str, content: str | List[bytes], done: bool = False):
         event = {
             "event": {
                 "type": "",
@@ -82,52 +84,48 @@ class Pipeline:
             event["event"]["data"]["done"] = done
         elif type == "message" or type == "replace":
             event["event"]["data"]["content"]=content
+        elif type == "files":
+            event["event"]["data"]["files"] = content
 
         event["event"]["type"] = type
         return event
-            
 
     def pipe(self, user_message: str, model_id: str, messages: List[dict], body: dict,) -> Union[str, Generator, Iterator]:
         # This is where you can add your custom RAG pipeline.
         if not body["stream"]:
             return None
+        
+        TESTING_DELAY = 2
 
         yield self._send_event(type="status", content="Retrieving Chunks")
 
-        time.sleep(5)
+        time.sleep(TESTING_DELAY)
 
         retrieved_chunks = self.retriever.retrieve(query=user_message)
 
         yield self._send_event(type="status", content="Aggregating Chunks")
 
-        time.sleep(5)
+        time.sleep(TESTING_DELAY)
 
         context = "\n\n".join(chunk.page_content for chunk in retrieved_chunks)
 
         yield self._send_event(type="status", content="Creating Prompt")
 
-        time.sleep(5)
+        time.sleep(TESTING_DELAY)
 
         prompt = PromptTemplate.from_template(self.QA_PROMPT)
 
         yield self._send_event(type="status", content="Asking LLM")
 
-        time.sleep(5)
-
         answering_chain = prompt | self.llm
-        answer = answering_chain.invoke(input={"context": context, "question": user_message})
+
+        time.sleep(TESTING_DELAY)
 
         yield self._send_event(type="status", content="Putting all together", done=True)
 
-        text = answer.content
+        for token in answering_chain.stream(input={"context": context, "question": user_message}):
+            yield self._send_event(type="message", content=token.content)
 
-        for token in text:
-            yield self._send_event(type="message", content=token)
-            time.sleep(0.02)
-
-        self._send_event(type="replace", content=text)
-
-
-
+        
 
 
