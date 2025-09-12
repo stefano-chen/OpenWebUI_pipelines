@@ -44,7 +44,7 @@ class Pipeline:
         #  > lms server start -p 9999
         # the -p flag is used to set a custom port number
         self.llm = ChatOpenAI(
-            model="qwen/qwen3-4b-2507",
+            model="qwen2.5-0.5b-instruct",
             base_url="http://localhost:9999/v1",
             api_key="not-needed" # LM Studio doesn't check it, but LangChain expects one
         )
